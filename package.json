@@ -42,6 +42,6 @@
   "bugs": {
     "url": "https://github.com/earthfor/ebook/issues"
   },
-  "homepage": "https://github.com/earthfor/ebook",
+  "homepage": "https://earthfor.github.io/ebook",
   "main": ".eslintrc.js"
 }
