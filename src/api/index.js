@@ -1,3 +1,4 @@
+/* eslint-disable */
 const EventEmitter = require('events')
 
 class API {
@@ -5,22 +6,85 @@ class API {
     const cancel = new EventEmitter()
     return (...args) => {
       const promiseHandle = new Promise((resolve, reject) => {
-        cancel.on('cancel', () => reject(new Error('Abort')))
-        func(...args).then(res => resolve(res)).catch(err => reject(err))
+        const f = func(...args)
+        f.then(res => resolve(res)).catch(err => reject(err))
+        cancel.on('cancel', (e) => {
+          //  Call their own cancel
+          f.cancel && f.cancel()
+          reject(new Error(e))
+        })
       })
       return Object.assign(promiseHandle, {
         cancel () {
-          cancel.emit('cancel')
+          cancel.emit('cancel', 'abort')
         }
       })
     }
   }
 
-  static async suggestion (word) {
-    return Array.from({ length: 10 }).fill({
-      word,
-      left: 123
+  static request (url, { method = 'GET', user = null, passwd = null, body, headers = [], timeout = 5000 }) {
+    const xhr = new window.XMLHttpRequest()
+
+    xhr.timeout = timeout
+    xhr.open(method, url, true, user, passwd)
+    headers.forEach(header => xhr.setRequestHeader(header.key, header.value))
+
+    const promiseHandle = new Promise((resolve, reject) => {
+      xhr.send(body)
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          const firstNumber = parseInt(this.status.toString().slice(0, 1), 10)
+
+          if (firstNumber < 4 && firstNumber > 0) {
+            resolve(xhr)
+            return
+          }
+
+          reject(xhr)
+        }
+      }
     })
+
+    return Object.assign(promiseHandle, {
+      cancel () {
+        xhr.abort()
+        return true
+      }
+    })
+  }
+
+  static proxyReq ({ url, config, data }) {
+    const proxyURL = 'https://pkindle.herokuapp.com/cors'
+    return this.request(proxyURL, {
+      method: 'post',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        url,
+        config,
+        data
+      })
+    })
+  }
+
+  static suggestion (word) {
+    const baseURL = 'https://www.qidian.com/ajax/Search/AutoComplete'
+    const params = new URLSearchParams()
+    params.append('_csrfToken', '')
+    params.append('siteid', 1)
+    params.append('query', word)
+
+    let func = () => {
+      //  TODO
+      const promiseHandle = this.proxyReq({
+        url: baseURL,
+
+      })
+    }
+
+    func = this.wrap(func)
+    return func()
   }
 }
 

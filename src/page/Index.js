@@ -19,7 +19,11 @@ class Index extends Component {
       },
       searchValue: '',
       history,
-      suggestion: [],
+      suggestion: {
+        last: null,
+        key: '',
+        data: []
+      },
       hot: []
     }
   }
@@ -41,11 +45,24 @@ class Index extends Component {
   }
 
   async inputValueChange (v) {
+    const { suggestion: sugg } = this.state
     const value = v.trim()
+
+    if (v === sugg.key) return
+
     this.setState({
       searchValue: value,
-      suggestion: await API.suggestion(v)
+      suggestion: {
+        last: null,
+        key: v,
+        data: []
+      }
     })
+
+    const handle = API.suggestion('')
+    const data = await handle
+    data.cancel()
+    console.log(data)
   }
 
   async componentDidMount () {
@@ -77,7 +94,7 @@ class Index extends Component {
           <ul className={`index-search-panel ${this.state.show.searchPanel ? '' : 'hidden'}`}>
             {
               this.state.searchValue
-                ? this.state.suggestion.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}><b>{v.word}</b>{v.left}</li>))
+                ? this.state.suggestion.data.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}><b>{v.word}</b>{v.left}</li>))
                 : this.state.history.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}>{v}</li>))
             }
           </ul>
