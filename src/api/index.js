@@ -1,4 +1,3 @@
-/* eslint-disable */
 const EventEmitter = require('events')
 
 class API {
@@ -22,12 +21,12 @@ class API {
     }
   }
 
-  static request (url, { method = 'GET', user = null, passwd = null, body, headers = [], timeout = 5000 }) {
+  static request (url, { method = 'GET', user = null, passwd = null, body, headers = {}, timeout = 5000 }) {
     const xhr = new window.XMLHttpRequest()
 
     xhr.timeout = timeout
     xhr.open(method, url, true, user, passwd)
-    headers.forEach(header => xhr.setRequestHeader(header.key, header.value))
+    Object.entries(headers).forEach(([key, value]) => xhr.setRequestHeader(key, value))
 
     const promiseHandle = new Promise((resolve, reject) => {
       xhr.send(body)
@@ -76,11 +75,18 @@ class API {
     params.append('query', word)
 
     let func = () => {
-      //  TODO
       const promiseHandle = this.proxyReq({
         url: baseURL,
-
+        config: {
+          search: params.toString(),
+          timeout: 5000
+        }
       })
+
+      const promiseResult = promiseHandle.then((xhr) => Promise.resolve(xhr.status))
+
+      const cancel = () => promiseHandle.cancel()
+      return Object.assign(promiseResult, { cancel })
     }
 
     func = this.wrap(func)
