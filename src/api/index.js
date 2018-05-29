@@ -76,17 +76,17 @@ class API {
 
     let func = () => {
       const promiseHandle = this.proxyReq({
-        url: baseURL
+        url: baseURL,
+        config: {
+          search: params.toString(),
+          timeout: 5000
+        }
       })
 
-      const cancel = () => {
-        promiseHandle.cancel()
-      }
+      const promiseResult = promiseHandle.then((xhr) => Promise.resolve(xhr.status))
 
-      const promiseReturn = promiseHandle
-        .then(res => Promise.resolve(res))
-
-      return Object.assign(promiseReturn, { cancel })
+      const cancel = () => promiseHandle.cancel()
+      return Object.assign(promiseResult, { cancel })
     }
 
     func = this.wrap(func)
