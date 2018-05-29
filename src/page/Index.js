@@ -60,8 +60,13 @@ class Index extends Component {
     })
 
     const handle = API.suggestion('')
-    const data = await handle
-    data.cancel()
+    handle.cancel()
+    let data
+    try {
+      data = await handle
+    } catch (e) {
+      console.log(e)
+    }
     console.log(data)
   }
 
