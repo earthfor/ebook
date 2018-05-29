@@ -45,14 +45,23 @@
  overflow: hidden;
 }
 .index-search-panel li {
+  position: relative;
   padding: 0 16px;
   font-size: 16px;
   line-height: 22px;
   overflow: hidden;
   white-space: nowrap;
+  cursor: default;
 }
 .index-search-panel li:hover {
   background: #eee;
+}
+.index-search-panel-category {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  font-size: 13px;
+  color: #9e9e9e;
 }
 
 .index-recent-hot {

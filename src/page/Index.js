@@ -48,26 +48,39 @@ class Index extends Component {
     const { suggestion: sugg } = this.state
     const value = v.trim()
 
-    if (v === sugg.key) return
+    //  Cancel last
+    sugg.last && sugg.last.cancel()
 
+    const handle = API.suggestion(value)
+
+    //  First store handle to last for next to cancel
     this.setState({
       searchValue: value,
       suggestion: {
-        last: null,
+        last: handle,
         key: v,
         data: []
       }
     })
 
-    const handle = API.suggestion('')
-    handle.cancel()
     let data
     try {
       data = await handle
     } catch (e) {
-      console.log(e)
+      if (e.message === 'Abort') {
+        return
+      }
+      throw e
     }
-    console.log(data)
+
+    //  So fill value into sugg
+    this.setState({
+      suggestion: {
+        last: null,
+        key: v,
+        data
+      }
+    })
   }
 
   async componentDidMount () {
@@ -99,7 +112,12 @@ class Index extends Component {
           <ul className={`index-search-panel ${this.state.show.searchPanel ? '' : 'hidden'}`}>
             {
               this.state.searchValue
-                ? this.state.suggestion.data.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}><b>{v.word}</b>{v.left}</li>))
+                ? this.state.suggestion.data.slice(0, 10).map((v, i) => (
+                  <li onMouseDown={() => this.search(v)} key={i}>
+                    <div className='index-search-panel-value'>{v.value}</div>
+                    {v.category && <div className='index-search-panel-category'>{v.category}</div>}
+                  </li>
+                ))
                 : this.state.history.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}>{v}</li>))
             }
           </ul>

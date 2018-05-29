@@ -15,7 +15,7 @@ class API {
       })
       return Object.assign(promiseHandle, {
         cancel () {
-          cancel.emit('cancel', 'abort')
+          cancel.emit('cancel', 'Abort')
         }
       })
     }
@@ -76,14 +76,38 @@ class API {
 
     let func = () => {
       const promiseHandle = this.proxyReq({
-        url: baseURL,
+        url: `${baseURL}?${params.toString()}`,
         config: {
-          search: params.toString(),
+          headers: {
+            'Host': 'www.qidian.com',
+            'Referer': 'https://www.qidian.com',
+            'User-Agent': window.navigator.userAgent
+          },
           timeout: 5000
         }
       })
 
-      const promiseResult = promiseHandle.then((xhr) => Promise.resolve(xhr.status))
+      const promiseResult = promiseHandle.then((xhr) => {
+        const res = JSON.parse(xhr.response)
+        if (res.data.status !== 200) {
+          return Promise.reject(new Error('Response status not 200'))
+        }
+
+        const content = JSON.parse(res.data.data)
+        const data = content.suggestions.map(v => {
+          const { category } = v.data
+          const item = {
+            value: v.value,
+            category
+          }
+
+          if (category === '书名') {
+            item.category = ''
+          }
+          return item
+        })
+        return Promise.resolve(data)
+      })
 
       const cancel = () => promiseHandle.cancel()
       return Object.assign(promiseResult, { cancel })
