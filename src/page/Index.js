@@ -10,7 +10,8 @@ class Index extends Component {
   constructor (props) {
     super(props)
 
-    const history = window.localStorage.getItem('search-history') || ['书本1', '书本2', '书本3']
+    let histories = window.localStorage.getItem('search-history') || '[]'
+    histories = JSON.parse(histories)
 
     this.state = {
       show: {
@@ -18,7 +19,7 @@ class Index extends Component {
         searchPanel: false
       },
       searchValue: '',
-      history,
+      histories,
       suggestion: {
         last: null,
         key: '',
@@ -87,8 +88,37 @@ class Index extends Component {
     this.changeSearchHover(true)
   }
 
+  storeHistory (histories) {
+    this.setState({
+      histories
+    })
+    window.localStorage.setItem('search-history', JSON.stringify(histories))
+  }
+
+  removeHistory (e, v) {
+    const { histories } = this.state
+    const idx = histories.findIndex(h => h.value === v)
+    idx !== -1 && histories.splice(idx, 1)
+
+    this.storeHistory(histories)
+
+    //  Prevent Event
+    e.preventDefault()
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }
+
   search (v) {
-    console.log(v)
+    //  Add to history
+    const { histories } = this.state
+    const hasItem = histories.some(h => h.value === v.value)
+
+    if (!hasItem) {
+      histories.push(v)
+      this.storeHistory(histories)
+    }
+
+    //  TODO: Emit Search event
   }
 
   render () {
@@ -118,7 +148,12 @@ class Index extends Component {
                     {v.category && <div className='index-search-panel-category'>{v.category}</div>}
                   </li>
                 ))
-                : this.state.history.slice(0, 10).map((v, i) => (<li onMouseDown={() => this.search(v)} key={i}>{v}</li>))
+                : this.state.histories.slice(0, 10).map((v, i) => (
+                  <li onMouseDown={() => this.search(v, true)} key={i}>
+                    <div className='index-search-panel-value'>{v.value}</div>
+                    <div className='index-search-panel-remove' onMouseDown={(e) => this.removeHistory(e, v.value)}>Remove</div>
+                  </li>
+                ))
             }
           </ul>
         </div>
