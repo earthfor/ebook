@@ -141,8 +141,8 @@ class Index extends Component {
   render () {
     return (
       <div className='index-container'>
-        <div className='index-log-container'>
-          <div className='index-log-content'>Hi, Ebooker!</div>
+        <div className='index-logo-container'>
+          <div className='index-logo-content'>Hi, Ebooker!</div>
         </div>
         <div
           className={`index-search-container ${this.state.show.searchHover ? 'index-search-container-hover' : ''}`}
