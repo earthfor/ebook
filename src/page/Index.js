@@ -30,18 +30,22 @@ class Index extends Component {
   }
 
   changeSearchHover (state) {
+    const { show } = this.state
+
+    show.searchHover = !!state
+
     this.setState({
-      show: {
-        searchHover: !!state
-      }
+      show
     })
   }
 
   changeSearchPanel (state) {
+    const { show } = this.state
+
+    show.searchPanel = !!state
+
     this.setState({
-      show: {
-        searchPanel: !!state
-      }
+      show
     })
   }
 
@@ -138,8 +142,8 @@ class Index extends Component {
             this.changeSearchPanel(false)
           }}
         >
-          <Search change={(v) => this.inputValueChange(v)} />
-          <ul className={`index-search-panel ${this.state.show.searchPanel ? '' : 'hidden'}`}>
+          <Search change={(v) => this.inputValueChange(v)} keyDown={(e) => this.inputKeyDown(e)} />
+          <ul className={`index-search-panel ${this.state.show.searchPanel && (this.state.suggestion.data.length || this.state.histories.length) ? '' : 'hidden'}`}>
             {
               this.state.searchValue
                 ? this.state.suggestion.data.slice(0, 10).map((v, i) => (
