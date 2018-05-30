@@ -92,6 +92,19 @@ class Index extends Component {
     this.changeSearchHover(true)
   }
 
+  inputKeyDown (e) {
+    const { key } = e
+
+    switch (key) {
+      case 'ArrowUp':
+      case 'ArrowDown':
+        console.log('2333')
+        break
+      default:
+        break
+    }
+  }
+
   storeHistory (histories) {
     this.setState({
       histories
@@ -142,7 +155,7 @@ class Index extends Component {
             this.changeSearchPanel(false)
           }}
         >
-          <Search change={(v) => this.inputValueChange(v)} keyDown={(e) => this.inputKeyDown(e)} />
+          <Search autoFocus change={(v) => this.inputValueChange(v)} keyDown={(e) => this.inputKeyDown(e)} />
           <ul className={`index-search-panel ${this.state.show.searchPanel && (this.state.suggestion.data.length || this.state.histories.length) ? '' : 'hidden'}`}>
             {
               this.state.searchValue
