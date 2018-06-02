@@ -52,13 +52,13 @@ class API {
     })
   }
 
-  static proxyReq ({ url, config, data }) {
+  static proxyReq ({ url, config, data }, headers) {
     const proxyURL = 'https://pkindle.herokuapp.com/cors'
     return this.request(proxyURL, {
       method: 'post',
-      headers: {
+      headers: Object.assign({}, {
         'Content-type': 'application/json'
-      },
+      }, headers),
       body: JSON.stringify({
         url,
         config,
@@ -69,6 +69,7 @@ class API {
 
   static suggestion (word) {
     const baseURL = 'https://www.qidian.com/ajax/Search/AutoComplete'
+    const timeout = 30000
     const params = new URLSearchParams()
     params.append('_csrfToken', '')
     params.append('siteid', 1)
@@ -83,8 +84,10 @@ class API {
             'Referer': 'https://www.qidian.com',
             'User-Agent': window.navigator.userAgent
           },
-          timeout: 5000
+          timeout
         }
+      }, {
+        timeout
       })
 
       const promiseResult = promiseHandle.then((xhr) => {
