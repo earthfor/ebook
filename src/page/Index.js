@@ -146,22 +146,7 @@ class Index extends Component {
       valueArray = suggData.slice(0, 10)
     }
 
-    const hideClass = show.searchPanel && valueArray.length ? '' : 'hidden'
-    return (
-      <ul className={`index-search-panel ${hideClass}`}>
-        {
-          valueArray.map((v, i) => {
-            return (
-              <li onMouseDown={() => this.search(v, true)} key={i}>
-                <div className='index-search-panel-value'>{v.value}</div>
-                { showHistory && <div className='index-search-panel-remove' onMouseDown={(e) => this.removeHistory(e, v.value)}>Remove</div>}
-                { !showHistory && v.category && <div className='index-search-panel-category'>{v.category}</div>}
-              </li>
-            )
-          })
-        }
-      </ul>
-    )
+    return valueArray
   }
 
   search (v) {
@@ -195,7 +180,19 @@ class Index extends Component {
           }}
         >
           <Search autoFocus change={(v) => this.inputValueChange(v)} keyDown={(e) => this.inputKeyDown(e)} />
-          { this.searchPanelValue() }
+          <ul className={`index-search-panel ${this.state.show.searchPanel && this.searchPanelValue().length ? '' : 'hidden'}`}>
+            {
+              this.searchPanelValue().map((v, i) => {
+                return (
+                  <li onMouseDown={() => this.search(v, true)} key={i}>
+                    <div className='index-search-panel-value'>{v.value}</div>
+                    { this.state.show.showHistory && <div className='index-search-panel-remove' onMouseDown={(e) => this.removeHistory(e, v.value)}>Remove</div>}
+                    { !this.state.show.showHistory && v.category && <div className='index-search-panel-category'>{v.category}</div>}
+                  </li>
+                )
+              })
+            }
+          </ul>
         </div>
         <div className='index-recent-hot'>
           <Hot title='其他人都在搜' data={this.state.hot} />
