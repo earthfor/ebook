@@ -6,6 +6,7 @@ import './Search.css'
 class Search extends Component {
   static get propTypes () {
     return {
+      value: PropTypes.string,
       change: PropTypes.any,
       keyDown: PropTypes.any,
       autoFocus: PropTypes.bool
@@ -15,7 +16,7 @@ class Search extends Component {
     return (
       <div className='search-container'>
         <div className='search-item search-item-input'>
-          <input autoFocus={this.props.autoFocus} className='search-item-input-content' type='text' name='search' placeholder='请输入小说名称，作者，主角' autoComplete='off'
+          <input value={this.props.value} autoFocus={this.props.autoFocus} className='search-item-input-content' type='text' name='search' placeholder='请输入小说名称，作者，主角' autoComplete='off'
             onChange={(e) => this.props.change(e.target.value)}
             onKeyDown={(e) => this.props.keyDown(e)}
           />

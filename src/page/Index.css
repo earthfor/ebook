@@ -69,6 +69,10 @@
   text-decoration: underline;
 }
 
+.index-search-panel-active {
+  background: #eee;;
+}
+
 .index-recent-hot {
   margin-top: 40px;
   text-align: center;
