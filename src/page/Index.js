@@ -19,7 +19,7 @@ class Index extends Component {
         searchPanel: false,
         showHistory: true
       },
-      nowArrowIdx: 0,
+      nowArrowIdx: -1,
       searchValue: '',
       searchValueCopy: '',
       histories,
@@ -49,7 +49,7 @@ class Index extends Component {
 
     this.setState({
       show,
-      nowArrowIdx: 0
+      nowArrowIdx: -1
     })
   }
 
@@ -63,7 +63,7 @@ class Index extends Component {
       show.showHistory = false
     }
 
-    this.setState({ show })
+    this.setState({ show, nowArrowIdx: -1 })
 
     //  Cancel last
     sugg.last && sugg.last.cancel()
@@ -106,8 +106,8 @@ class Index extends Component {
   }
 
   inputKeyDown (e) {
-    const { nowArrowIdx, show } = this.state
-    const { searchPanel, searchValueCopy } = show
+    const { nowArrowIdx, show, searchValueCopy } = this.state
+    const { searchPanel } = show
     const searchPanelValue = this.searchPanelValue()
     const { length } = searchPanelValue
 
@@ -119,12 +119,12 @@ class Index extends Component {
     switch (key) {
       case 'ArrowUp':
         idx = nowArrowIdx - 1
-        if (idx < 0) {
-          nowArrowI = length
+        if (idx < -1) {
+          nowArrowI = length - 1
           searchV = searchPanelValue[length - 1].value
         } else {
           nowArrowI = idx
-          searchV = idx === 0 ? searchValueCopy : searchPanelValue[idx - 1].value
+          searchV = idx === -1 ? searchValueCopy : searchPanelValue[idx].value
         }
         this.setState({
           searchValue: searchV,
@@ -133,11 +133,11 @@ class Index extends Component {
         break
       case 'ArrowDown':
         idx = nowArrowIdx + 1
-        if (idx > length) {
+        if (idx === length) {
           searchV = searchValueCopy
-          nowArrowI = 0
+          nowArrowI = -1
         } else {
-          searchV = searchPanelValue[idx - 1].value
+          searchV = searchPanelValue[idx].value
           nowArrowI = idx
         }
         this.setState({
@@ -221,7 +221,7 @@ class Index extends Component {
             {
               this.searchPanelValue().map((v, i) => {
                 return (
-                  <li onMouseDown={() => this.search(v, true)} className={this.state.nowArrowIdx - 1 === i ? 'index-search-panel-active' : ''} key={i}>
+                  <li onMouseDown={() => this.search(v, true)} className={this.state.nowArrowIdx === i ? 'index-search-panel-active' : ''} key={i}>
                     <div className='index-search-panel-value'>{v.value}</div>
                     { this.state.show.showHistory && <div className='index-search-panel-remove' onMouseDown={(e) => this.removeHistory(e, v.value)}>Remove</div>}
                     { !this.state.show.showHistory && v.category && <div className='index-search-panel-category'>{v.category}</div>}
