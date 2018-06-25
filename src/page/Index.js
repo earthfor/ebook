@@ -148,6 +148,7 @@ class Index extends Component {
       default:
         break
     }
+    return searchV
   }
 
   storeHistory (histories) {
