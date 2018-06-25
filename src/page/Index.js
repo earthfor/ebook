@@ -106,7 +106,7 @@ class Index extends Component {
   }
 
   inputKeyDown (e) {
-    const { nowArrowIdx, show, searchValueCopy } = this.state
+    const { nowArrowIdx, show, searchValueCopy, searchValue } = this.state
     const { searchPanel } = show
     const searchPanelValue = this.searchPanelValue()
     const { length } = searchPanelValue
@@ -144,6 +144,10 @@ class Index extends Component {
           searchValue: searchV,
           nowArrowIdx: nowArrowI
         })
+        break
+      case 'Enter':
+        this.setState({ nowArrowIdx: -1 }) // Reset nowArrowIdx
+        this.search({ value: searchValue })
         break
       default:
         break
@@ -187,6 +191,8 @@ class Index extends Component {
   }
 
   search (v) {
+    //  For empty value
+    if (v.value === undefined || v.value === '') return
     //  Add to history
     const { histories } = this.state
     const hasItem = histories.some(h => h.value === v.value)
